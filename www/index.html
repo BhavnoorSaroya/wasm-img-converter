@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JPG to PNG Conversion</title>
+    <script type="module">
+        import init, { convert_jpg_to_png } from '../pkg/wasm_image_converter.js';
+
+        async function handleFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const buffer = new Uint8Array(e.target.result);
+                await init(); // Initialize the wasm module
+                const pngData = convert_jpg_to_png(buffer);
+                const blob = new Blob([pngData], { type: 'image/png' });
+                const url = URL.createObjectURL(blob);
+                document.getElementById('output').src = url;
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        document.getElementById('fileInput').addEventListener('change', handleFile);
+    </script>
+</head>
+<body>
+    <h1>Convert JPG to PNG</h1>
+    <input type="file" id="fileInput" accept="image/jpeg" />
+    <img id="output" alt="Converted PNG" />
+</body>
+</html>
+
